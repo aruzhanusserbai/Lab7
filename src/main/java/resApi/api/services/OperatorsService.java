@@ -36,4 +36,15 @@ public class OperatorsService {
     public Operators addOperator(Operators newOperator){
         return operatorsRepository.save(newOperator);
     }
+
+    public Operators update(Operators operator, Long operatorId){
+        Operators updateOperator = operatorsRepository.findById(operatorId).orElseThrow();
+
+        updateOperator.setName(operator.getName());
+        updateOperator.setSurname(operator.getSurname());
+        updateOperator.setDepartment(operator.getDepartment());
+
+        operatorsRepository.save(updateOperator);
+        return updateOperator;
+    }
 }

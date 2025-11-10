@@ -6,12 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import resApi.api.entities.Courses;
+import resApi.api.entities.Operators;
 import resApi.api.services.CoursesService;
 
 import java.util.List;
 import java.util.Objects;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/courses")
 public class CoursesController {
@@ -24,7 +25,7 @@ public class CoursesController {
         if(courses.isEmpty()){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }else{
-            return new ResponseEntity<>(HttpStatus.OK);
+            return ResponseEntity.ok(courses);
         }
     }
 
@@ -50,5 +51,15 @@ public class CoursesController {
         }
     }
 
+    @PutMapping("/{id}/update")
+    public ResponseEntity<?> updateCourse(@RequestBody Courses course, @PathVariable Long id){
+        Courses updatedCourse = coursesService.update(course, id);
+
+        if(Objects.isNull(updatedCourse)){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }else{
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
 
 }

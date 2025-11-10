@@ -31,5 +31,16 @@ public class CoursesService {
 
     }
 
+    public Courses update(Courses course, Long id){
+        Courses updatedCourse = coursesRepository.findById(id).orElseThrow();
+
+        updatedCourse.setName(course.getName());
+        updatedCourse.setDescription(course.getDescription());
+        updatedCourse.setPrice(course.getPrice());
+
+        coursesRepository.save(updatedCourse);
+        return updatedCourse;
+    }
+
 }
 

@@ -6,12 +6,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import resApi.api.entities.Operators;
+import resApi.api.repositories.OperatorsRepository;
 import resApi.api.services.OperatorsService;
 
 import java.util.List;
 import java.util.Objects;
 
-@Controller
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/operators")
 public class OperatorsController {
@@ -51,10 +52,21 @@ public class OperatorsController {
     }
 
     @PostMapping("/add/operator")
-    public ResponseEntity<?> addOperator(Operators operator){
+    public ResponseEntity<?> addOperator(@RequestBody Operators operator){
         Operators createdOperator = operatorsService.addOperator(operator);
 
         if(Objects.isNull(createdOperator)){
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        }else{
+            return new ResponseEntity<>(HttpStatus.OK);
+        }
+    }
+
+    @PutMapping("/{id}/update")
+    public ResponseEntity<?> updateOperator(@RequestBody Operators operator, @PathVariable Long id){
+        Operators updatedOperator = operatorsService.update(operator, id);
+
+        if(Objects.isNull(updatedOperator)){
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }else{
             return new ResponseEntity<>(HttpStatus.OK);

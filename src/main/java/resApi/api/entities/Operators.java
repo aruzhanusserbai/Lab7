@@ -1,6 +1,8 @@
 package resApi.api.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -30,5 +32,6 @@ public class Operators {
             joinColumns = @JoinColumn(name = "operators_id"),
             inverseJoinColumns = @JoinColumn(name = "applicationRequest_id")
     )
+    @JsonBackReference
     private List<ApplicationRequest> requests = new ArrayList<>();
 }

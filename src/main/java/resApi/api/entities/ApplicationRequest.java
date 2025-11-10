@@ -1,5 +1,8 @@
 package resApi.api.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -30,9 +33,11 @@ public class ApplicationRequest {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id", nullable = false)
+    @JsonBackReference
     private Courses course;
 
     @ManyToMany(mappedBy = "requests")
+    @JsonManagedReference
     private List<Operators> operators = new ArrayList<>();
 
 }

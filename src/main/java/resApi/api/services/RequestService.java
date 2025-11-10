@@ -2,6 +2,7 @@ package resApi.api.services;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import resApi.api.dto.RequestDto;
 import resApi.api.entities.ApplicationRequest;
 import resApi.api.entities.Courses;
 import resApi.api.entities.Operators;
@@ -11,6 +12,7 @@ import resApi.api.repositories.RequestRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -19,27 +21,53 @@ public class RequestService {
     private final CoursesRepository coursesRepository;
     private final OperatorsRepository operatorsRepository;
 
-    public List<ApplicationRequest> getAll(){
-        return requestRepository.findAll();
+
+    public List<RequestDto> getAll(){
+        List<ApplicationRequest> requests = requestRepository.findAll();
+        List<RequestDto> requestDtos = new ArrayList<>();
+
+        requests.forEach(request -> {
+            RequestDto requestDto = toDto(request);
+            requestDtos.add(requestDto);
+        });
+
+        return requestDtos;
     }
 
-    public ApplicationRequest addNewReq(ApplicationRequest newRequest, Long courseId){
+
+    public RequestDto addNewReq(RequestDto newRequest, Long courseId){
         Courses course = coursesRepository.findById(courseId).orElseThrow();
         newRequest.setCourse(course);
-        return requestRepository.save(newRequest);
+
+        ApplicationRequest createdReq = toEntity(newRequest);
+        requestRepository.save(createdReq);
+
+        return toDto(createdReq);
     }
 
-    public ApplicationRequest getRequestById(Long id){
-        ApplicationRequest request = requestRepository.findById(id).orElseThrow();
+
+    public RequestDto getRequestById(Long id){
+        ApplicationRequest request = requestRepository.findById(id).orElse(null);
+
+        if(Objects.isNull(request)){
+            return null;
+        }
 
         if(request.getOperators().isEmpty()){
             request.setHandled(false);
         }
-        return request;
+
+        return toDto(request);
     }
 
-    public ApplicationRequest update(Long id, ArrayList<Long> operatorIds){
-        ApplicationRequest request = requestRepository.findById(id).orElseThrow();
+
+    public RequestDto update(Long id, ArrayList<Long> operatorIds){
+        ApplicationRequest request = requestRepository.findById(id).orElse(null);
+
+        if(Objects.isNull(request)){
+            return null;
+        }
+
         List<Operators> operators = new ArrayList<>();
 
         operatorIds.forEach(operatorId -> operators.add(operatorsRepository.findById(operatorId).orElseThrow()));
@@ -49,8 +77,9 @@ public class RequestService {
         operatorIds.forEach(operatorId -> (operatorsRepository.findById(operatorId).orElseThrow()).getRequests().add(request));
         operatorsRepository.saveAll(operators);
 
-        return requestRepository.save(request);
+        return toDto(request);
     }
+
 
     public boolean deleteOperatorId(Long operatorId, Long requestId){
         ApplicationRequest request = requestRepository.findById(requestId).orElseThrow();
@@ -69,4 +98,32 @@ public class RequestService {
         }
     }
 
+
+    public RequestDto toDto(ApplicationRequest request){
+        RequestDto requestDto = RequestDto
+                .builder()
+                .id(request.getId())
+                .userName(request.getUserName())
+                .commentary(request.getCommentary())
+                .phone(request.getPhone())
+                .handled(request.isHandled())
+                .course(request.getCourse())
+                .operators(request.getOperators())
+                .build();
+
+        return requestDto;
+    }
+
+    public ApplicationRequest toEntity(RequestDto dto){
+        ApplicationRequest request = new ApplicationRequest();
+        request.setId(dto.getId());
+        request.setUserName(dto.getUserName());
+        request.setCommentary(dto.getCommentary());
+        request.setPhone(dto.getPhone());
+        request.setCourse(dto.getCourse());
+        request.setHandled(dto.isHandled());
+        request.setOperators(dto.getOperators());
+
+        return request;
+    }
 }

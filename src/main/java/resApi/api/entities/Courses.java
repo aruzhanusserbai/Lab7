@@ -1,6 +1,8 @@
 package resApi.api.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,6 +30,7 @@ public class Courses {
     private int price;
 
     @OneToMany(mappedBy = "course", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonManagedReference
     private List<ApplicationRequest> requests = new ArrayList<>();
 
 }
