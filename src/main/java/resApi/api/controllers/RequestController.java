@@ -17,7 +17,7 @@ import java.util.Objects;
 public class RequestController {
     private final RequestService requestService;
 
-    @GetMapping("/")
+    @GetMapping()
     public ResponseEntity<?> home(){
         List<RequestDto> requests = requestService.getAll();
 
@@ -30,8 +30,8 @@ public class RequestController {
 
 
     @PostMapping("/add")
-    public ResponseEntity<?> addRequest(RequestDto request, @RequestParam Long courseId){
-        RequestDto createdRequest = requestService.addNewReq(request, courseId);
+    public ResponseEntity<?> addRequest(@RequestBody RequestDto request){
+        RequestDto createdRequest = requestService.addNewReq(request, request.getCourseId());
 
         return new ResponseEntity<>(createdRequest, HttpStatus.CREATED);
     }
@@ -48,7 +48,7 @@ public class RequestController {
     }
 
     @PutMapping("/{id}/operators/add")
-    public ResponseEntity<?> addOperators(@PathVariable Long id, @RequestParam ArrayList<Long> operatorIds ){
+    public ResponseEntity<?> addOperators(@PathVariable Long id, @RequestBody ArrayList<Long> operatorIds ){
         RequestDto updateRequest = requestService.update(id, operatorIds);
 
         if(Objects.isNull(updateRequest)){
@@ -58,8 +58,8 @@ public class RequestController {
         }
     }
 
-    @DeleteMapping("/delete/operator/{operatorId}")
-    public ResponseEntity<?> deleteOperator(@PathVariable Long operatorId, @RequestParam Long requestId){
+    @DeleteMapping("/{requestId}/delete/operator/{operatorId}")
+    public ResponseEntity<?> deleteOperator(@PathVariable Long operatorId, @PathVariable Long requestId){
         boolean removed = requestService.deleteOperatorId(operatorId, requestId);
 
         if(removed){

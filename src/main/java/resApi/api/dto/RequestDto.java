@@ -24,6 +24,6 @@ public class RequestDto {
     private String commentary;
     private String phone;
     private boolean handled = false;
-    private Courses course;
-    private List<Operators> operators = new ArrayList<>();
+    private Long courseId;
+    private List<Long> operatorIds;
 }

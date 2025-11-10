@@ -37,7 +37,7 @@ public class RequestService {
 
     public RequestDto addNewReq(RequestDto newRequest, Long courseId){
         Courses course = coursesRepository.findById(courseId).orElseThrow();
-        newRequest.setCourse(course);
+        newRequest.setCourseId(course.getId());
 
         ApplicationRequest createdReq = toEntity(newRequest);
         requestRepository.save(createdReq);
@@ -100,6 +100,9 @@ public class RequestService {
 
 
     public RequestDto toDto(ApplicationRequest request){
+        List<Long> operatorIds = new ArrayList<>();
+        request.getOperators().forEach(operator -> operatorIds.add(operator.getId()));
+
         RequestDto requestDto = RequestDto
                 .builder()
                 .id(request.getId())
@@ -107,22 +110,28 @@ public class RequestService {
                 .commentary(request.getCommentary())
                 .phone(request.getPhone())
                 .handled(request.isHandled())
-                .course(request.getCourse())
-                .operators(request.getOperators())
+                .courseId(request.getCourse().getId())
+                .operatorIds(operatorIds)
                 .build();
 
         return requestDto;
     }
 
     public ApplicationRequest toEntity(RequestDto dto){
+        Courses course = coursesRepository.findById(dto.getCourseId()).orElseThrow();
+
+        List<Operators> operators = new ArrayList<>();
+
+        dto.getOperatorIds().forEach(operatorId -> operators.add(operatorsRepository.findById(operatorId).orElseThrow()));
+
         ApplicationRequest request = new ApplicationRequest();
         request.setId(dto.getId());
         request.setUserName(dto.getUserName());
         request.setCommentary(dto.getCommentary());
         request.setPhone(dto.getPhone());
-        request.setCourse(dto.getCourse());
+        request.setCourse(course);
         request.setHandled(dto.isHandled());
-        request.setOperators(dto.getOperators());
+        request.setOperators(operators);
 
         return request;
     }
